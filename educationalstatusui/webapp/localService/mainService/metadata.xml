@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+        <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="EducationalService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotation Term="Core.Links">
+                <Collection>
+                    <Record>
+                        <PropertyValue Property="rel" String="author"/>
+                        <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+                    </Record>
+                </Collection>
+            </Annotation>
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="Educational_Details" EntityType="EducationalService.Educational_Details"/>
+                <EntitySet Name="Educational_History" EntityType="EducationalService.Educational_History"/>
+                <EntitySet Name="SFData" EntityType="EducationalService.SFData"/>
+                <EntitySet Name="SH_Institutes" EntityType="EducationalService.SH_Institutes"/>
+                <ActionImport Name="SH_InstitutesHANA" Action="EducationalService.SH_InstitutesHANA"/>
+                <ActionImport Name="createInDetailsTable" Action="EducationalService.createInDetailsTable"/>
+                <ActionImport Name="updateSFData" Action="EducationalService.updateSFData"/>
+                <ActionImport Name="getAllUniformStatusCountsNew" Action="EducationalService.getAllUniformStatusCountsNew"/>
+                <ActionImport Name="getAllUniformStatusCounts" Action="EducationalService.getAllUniformStatusCounts"/>
+                <ActionImport Name="getUniformStatusPsids" Action="EducationalService.getUniformStatusPsids"/>
+                <ActionImport Name="getUniformStatusPsidsNew" Action="EducationalService.getUniformStatusPsidsNew"/>
+                <ActionImport Name="sendEmail" Action="EducationalService.sendEmail"/>
+                <ActionImport Name="getInDraftPSIDs" Action="EducationalService.getInDraftPSIDs"/>
+            </EntityContainer>
+            <EntityType Name="Educational_Details">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="psid" Type="Edm.String" MaxLength="20"/>
+                <Property Name="name" Type="Edm.String" MaxLength="150"/>
+                <Property Name="comments" Type="Collection(Edm.String)" Nullable="true"/>
+                <Property Name="ic" Type="Edm.String" MaxLength="100"/>
+                <Property Name="ichr" Type="Edm.String" MaxLength="150"/>
+                <Property Name="newfilename" Type="Edm.String" MaxLength="20"/>
+                <Property Name="status" Type="Edm.String" MaxLength="20"/>
+                <Property Name="isnewcourse" Type="Edm.String" MaxLength="10"/>
+                <Property Name="isfirstentry" Type="Edm.String" MaxLength="10"/>
+                <Property Name="email" Type="Edm.String" MaxLength="100"/>
+                <Property Name="modifiedfields" Type="Edm.String" MaxLength="2000"/>
+                <Property Name="cust_Qualification_Type" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Qualification_Type_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Duration_Of_The_Course" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_Institute" Type="Edm.String" MaxLength="150"/>
+                <Property Name="Institute_Desc" Type="Edm.String" MaxLength="150"/>
+                <Property Name="cust_Year_of_Passing" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_University" Type="Edm.String" MaxLength="150"/>
+                <Property Name="University_Desc" Type="Edm.String" MaxLength="150"/>
+                <Property Name="cust_CGPA" Type="Edm.String" MaxLength="10"/>
+                <Property Name="CGPA_Desc" Type="Edm.String" MaxLength="10"/>
+                <Property Name="cust_Percentage" Type="Edm.String" MaxLength="10"/>
+                <Property Name="Percentage_Desc" Type="Edm.String" MaxLength="10"/>
+                <Property Name="cust_Division" Type="Edm.String" MaxLength="20"/>
+                <Property Name="Division_Desc" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_Type_Of_The_Course" Type="Edm.String" MaxLength="20"/>
+                <Property Name="Type_Of_The_Course_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Grade" Type="Edm.String" MaxLength="20"/>
+                <Property Name="Grade_Desc" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_Qualification_Sub_Type" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Qualification_Sub_Type_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Education_Certificate" Type="Edm.String" MaxLength="150"/>
+                <Property Name="Education_Certificate_Desc" Type="Edm.String" MaxLength="150"/>
+                <Property Name="cust_Branch_1" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Branch_1_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Branch_2" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Branch_2_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Academic_End_Date" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Academic_Start_Date" Type="Edm.String" MaxLength="100"/>
+                <Property Name="externalCode" Type="Edm.String" MaxLength="20"/>
+                <Property Name="ParentLegacy_effectiveStartDate" Type="Edm.String" MaxLength="100"/>
+            </EntityType>
+            <EntityType Name="Educational_History">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="edu_details_key" Type="Edm.String" MaxLength="100"/>
+                <Property Name="psid" Type="Edm.String" MaxLength="20"/>
+                <Property Name="name" Type="Edm.String" MaxLength="150"/>
+                <Property Name="comments" Type="Collection(Edm.String)" Nullable="true"/>
+                <Property Name="ic" Type="Edm.String" MaxLength="100"/>
+                <Property Name="ichr" Type="Edm.String" MaxLength="150"/>
+                <Property Name="newfilename" Type="Edm.String" MaxLength="20"/>
+                <Property Name="status" Type="Edm.String" MaxLength="20"/>
+                <Property Name="isnewcourse" Type="Edm.String" MaxLength="10"/>
+                <Property Name="isfirstentry" Type="Edm.String" MaxLength="10"/>
+                <Property Name="email" Type="Edm.String" MaxLength="100"/>
+                <Property Name="modifiedfields" Type="Edm.String" MaxLength="2000"/>
+                <Property Name="cust_Qualification_Type" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Qualification_Type_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Duration_Of_The_Course" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_Institute" Type="Edm.String" MaxLength="150"/>
+                <Property Name="Institute_Desc" Type="Edm.String" MaxLength="150"/>
+                <Property Name="cust_Year_of_Passing" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_University" Type="Edm.String" MaxLength="150"/>
+                <Property Name="University_Desc" Type="Edm.String" MaxLength="150"/>
+                <Property Name="cust_CGPA" Type="Edm.String" MaxLength="10"/>
+                <Property Name="CGPA_Desc" Type="Edm.String" MaxLength="10"/>
+                <Property Name="cust_Percentage" Type="Edm.String" MaxLength="10"/>
+                <Property Name="Percentage_Desc" Type="Edm.String" MaxLength="10"/>
+                <Property Name="cust_Division" Type="Edm.String" MaxLength="20"/>
+                <Property Name="Division_Desc" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_Type_Of_The_Course" Type="Edm.String" MaxLength="20"/>
+                <Property Name="Type_Of_The_Course_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Grade" Type="Edm.String" MaxLength="20"/>
+                <Property Name="Grade_Desc" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_Qualification_Sub_Type" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Qualification_Sub_Type_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Education_Certificate" Type="Edm.String" MaxLength="150"/>
+                <Property Name="Education_Certificate_Desc" Type="Edm.String" MaxLength="150"/>
+                <Property Name="cust_Branch_1" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Branch_1_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Branch_2" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Branch_2_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Academic_End_Date" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Academic_Start_Date" Type="Edm.String" MaxLength="100"/>
+                <Property Name="externalCode" Type="Edm.String" MaxLength="20"/>
+                <Property Name="ParentLegacy_effectiveStartDate" Type="Edm.String" MaxLength="100"/>
+            </EntityType>
+            <EntityType Name="SFData">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="psid" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Qualification_Type" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Qualification_Type_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Duration_Of_The_Course" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_Institute" Type="Edm.String" MaxLength="150"/>
+                <Property Name="Institute_Desc" Type="Edm.String" MaxLength="150"/>
+                <Property Name="cust_Year_of_Passing" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_University" Type="Edm.String" MaxLength="150"/>
+                <Property Name="University_Desc" Type="Edm.String" MaxLength="150"/>
+                <Property Name="cust_CGPA" Type="Edm.String" MaxLength="10"/>
+                <Property Name="CGPA_Desc" Type="Edm.String" MaxLength="10"/>
+                <Property Name="cust_Percentage" Type="Edm.String" MaxLength="10"/>
+                <Property Name="Percentage_Desc" Type="Edm.String" MaxLength="10"/>
+                <Property Name="cust_Division" Type="Edm.String" MaxLength="20"/>
+                <Property Name="Division_Desc" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_Type_Of_The_Course" Type="Edm.String" MaxLength="20"/>
+                <Property Name="Type_Of_The_Course_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Grade" Type="Edm.String" MaxLength="20"/>
+                <Property Name="Grade_Desc" Type="Edm.String" MaxLength="20"/>
+                <Property Name="cust_Qualification_Sub_Type" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Qualification_Sub_Type_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Education_Certificate" Type="Edm.String" MaxLength="150"/>
+                <Property Name="Education_Certificate_Desc" Type="Edm.String" MaxLength="150"/>
+                <Property Name="cust_Branch_1" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Branch_1_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Branch_2" Type="Edm.String" MaxLength="100"/>
+                <Property Name="Branch_2_Desc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Academic_End_Date" Type="Edm.String" MaxLength="100"/>
+                <Property Name="cust_Academic_Start_Date" Type="Edm.String" MaxLength="100"/>
+                <Property Name="externalCode" Type="Edm.String" MaxLength="20"/>
+                <Property Name="ParentLegacy_effectiveStartDate" Type="Edm.String" MaxLength="100"/>
+            </EntityType>
+            <EntityType Name="SH_Institutes">
+                <Key>
+                    <PropertyRef Name="externalCode"/>
+                </Key>
+                <Property Name="externalCode" Type="Edm.String" MaxLength="10" Nullable="false"/>
+                <Property Name="externalName" Type="Edm.String" MaxLength="150"/>
+            </EntityType>
+            <ComplexType Name="StatusResult">
+                <Property Name="count" Type="Edm.Int32"/>
+                <Property Name="q01Records" Type="Collection(EducationalService.Q01Record)" Nullable="true"/>
+            </ComplexType>
+            <ComplexType Name="return_EducationalService_updateSFData">
+                <Property Name="created" Type="Edm.Int32"/>
+                <Property Name="updated" Type="Edm.Int32"/>
+            </ComplexType>
+            <ComplexType Name="Q01Record">
+                <Property Name="PSID" Type="Edm.String"/>
+                <Property Name="status" Type="Edm.String"/>
+                <Property Name="cust_Qualification_Type" Type="Edm.String"/>
+                <Property Name="ICHR" Type="Edm.String"/>
+            </ComplexType>
+            <ComplexType Name="return_EducationalService_getAllUniformStatusCountsNew">
+                <Property Name="PA" Type="EducationalService.StatusResult"/>
+                <Property Name="A" Type="EducationalService.StatusResult"/>
+                <Property Name="R" Type="EducationalService.StatusResult"/>
+                <Property Name="D" Type="EducationalService.StatusResult"/>
+                <Property Name="SA" Type="EducationalService.StatusResult"/>
+            </ComplexType>
+            <ComplexType Name="return_EducationalService_getAllUniformStatusCounts">
+                <Property Name="PA" Type="EducationalService.StatusResult"/>
+                <Property Name="A" Type="EducationalService.StatusResult"/>
+                <Property Name="R" Type="EducationalService.StatusResult"/>
+            </ComplexType>
+            <ComplexType Name="return_EducationalService_getUniformStatusPsids">
+                <Property Name="PA" Type="EducationalService.StatusResult"/>
+                <Property Name="A" Type="EducationalService.StatusResult"/>
+                <Property Name="R" Type="EducationalService.StatusResult"/>
+            </ComplexType>
+            <ComplexType Name="return_EducationalService_getUniformStatusPsidsNew">
+                <Property Name="PA" Type="EducationalService.StatusResult"/>
+                <Property Name="A" Type="EducationalService.StatusResult"/>
+                <Property Name="R" Type="EducationalService.StatusResult"/>
+                <Property Name="D" Type="EducationalService.StatusResult"/>
+                <Property Name="SA" Type="EducationalService.StatusResult"/>
+            </ComplexType>
+            <ComplexType Name="return_EducationalService_sendEmail">
+                <Property Name="success" Type="Edm.Boolean"/>
+                <Property Name="messageId" Type="Edm.String"/>
+                <Property Name="error" Type="Edm.String"/>
+            </ComplexType>
+            <ComplexType Name="return_EducationalService_getInDraftPSIDs">
+                <Property Name="success" Type="Edm.Boolean"/>
+                <Property Name="eduCount" Type="Edm.Int32"/>
+                <Property Name="sfCount" Type="Edm.Int32"/>
+                <Property Name="inDraftCount" Type="Edm.Int32"/>
+                <Property Name="inDraftRecords" Type="Collection(EducationalService.return_EducationalService_getInDraftPSIDs_inDraftRecords)" Nullable="true"/>
+            </ComplexType>
+            <ComplexType Name="return_EducationalService_getInDraftPSIDs_inDraftRecords">
+                <Property Name="psid" Type="Edm.String"/>
+                <Property Name="modifiedAt" Type="Edm.String"/>
+            </ComplexType>
+            <Action Name="SH_InstitutesHANA" IsBound="false">
+                <Parameter Name="externalCode" Type="Edm.String"/>
+                <ReturnType Type="Collection(Edm.String)" Nullable="true"/>
+            </Action>
+            <Action Name="createInDetailsTable" IsBound="false">
+                <Parameter Name="psid" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Action>
+            <Action Name="updateSFData" IsBound="false">
+                <Parameter Name="data" Type="Collection(EducationalService.SFData)" Nullable="true"/>
+                <ReturnType Type="EducationalService.return_EducationalService_updateSFData"/>
+            </Action>
+            <Action Name="getAllUniformStatusCountsNew" IsBound="false">
+                <Parameter Name="ichr" Type="Edm.String"/>
+                <ReturnType Type="EducationalService.return_EducationalService_getAllUniformStatusCountsNew"/>
+            </Action>
+            <Action Name="getAllUniformStatusCounts" IsBound="false">
+                <Parameter Name="ichr" Type="Edm.String"/>
+                <ReturnType Type="EducationalService.return_EducationalService_getAllUniformStatusCounts"/>
+            </Action>
+            <Action Name="getUniformStatusPsids" IsBound="false">
+                <Parameter Name="ichr" Type="Edm.String"/>
+                <Parameter Name="status" Type="Edm.String"/>
+                <ReturnType Type="EducationalService.return_EducationalService_getUniformStatusPsids"/>
+            </Action>
+            <Action Name="getUniformStatusPsidsNew" IsBound="false">
+                <Parameter Name="ichr" Type="Edm.String"/>
+                <Parameter Name="status" Type="Edm.String"/>
+                <ReturnType Type="EducationalService.return_EducationalService_getUniformStatusPsidsNew"/>
+            </Action>
+            <Action Name="sendEmail" IsBound="false">
+                <Parameter Name="from" Type="Edm.String"/>
+                <Parameter Name="to" Type="Edm.String"/>
+                <Parameter Name="cc" Type="Edm.String"/>
+                <Parameter Name="subject" Type="Edm.String"/>
+                <Parameter Name="html" Type="Edm.String"/>
+                <ReturnType Type="EducationalService.return_EducationalService_sendEmail"/>
+            </Action>
+            <Action Name="getInDraftPSIDs" IsBound="false">
+                <ReturnType Type="EducationalService.return_EducationalService_getInDraftPSIDs"/>
+            </Action>
+            <Annotations Target="EducationalService.Educational_Details/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="EducationalService.Educational_Details/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="EducationalService.Educational_Details/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="EducationalService.Educational_Details/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="EducationalService.Educational_Details/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+            <Annotations Target="EducationalService.Educational_History/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="EducationalService.Educational_History/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="EducationalService.Educational_History/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="EducationalService.Educational_History/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="EducationalService.Educational_History/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+            <Annotations Target="EducationalService.SFData/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="EducationalService.SFData/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="EducationalService.SFData/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="EducationalService.SFData/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="EducationalService.SFData/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
