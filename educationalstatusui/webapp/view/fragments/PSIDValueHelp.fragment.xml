@@ -1,0 +1,20 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <SelectDialog
+        noDataText="No Data Text"
+        title="Select PS ID"
+        contentWidth= "40%"
+        search=".psidSearch"
+        confirm=".psidClose"
+        cancel=".psidClose"
+        liveChange=".psidSearch"
+        items="{
+            path : 'psidModel>/',
+            sorter : {
+                path : 'psid'
+            }
+        }">
+        <StandardListItem 
+            title="{psidModel>psid}"
+            description="{psidModel>name}"/>
+    </SelectDialog>
+</core:FragmentDefinition>

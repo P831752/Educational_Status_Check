@@ -1,90 +1,154 @@
 <mvc:View controllerName="com.lt.educationalstatusui.controller.Educational_Status_Check"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns:core="sap.ui.core"
-    xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-    
-
-    <content>
-        <VBox class="sapUiSmallMargin">
-
-            <!-- Header 1 Section -->
-            <Panel headerText="Header 1" backgroundDesign="Solid" class="sapUiMediumMarginBottom">
-                <VBox>
-                    <!-- Filters -->
-                    <HBox class="sapUiSmallMarginBottom" alignItems="Center" justifyContent="Start">
-                        <Label text="Search By PSID" labelFor="psidInput"/>
-                        <Input id="psidInput" width="150px" class="sapUiTinyMarginBegin"/>
-                        <Button text="Go" type="Emphasized" press="onSearchPSID" class="sapUiTinyMarginBegin"/>
-                        <Label text="Status Change To" class="sapUiTinyMarginBegin"/>
-                        <Select id="statusSelect" width="150px" class="sapUiTinyMarginBegin">
-                            <items>
-                                <core:Item key="InitialDraft" text="Initial Draft"/>
-                                <core:Item key="PendingApproval" text="Pending Approval"/>
-                                <core:Item key="Draft" text="Draft"/>
-                            </items>
-                        </Select>
-                    </HBox>
-
-                    <!-- Table -->
-                    <Table id="psidTable" inset="false" width="100%">
-                        <headerToolbar>
-                            <Toolbar>
-                                <Title text="PSID Details" level="H4"/>
-                            </Toolbar>
-                        </headerToolbar>
-                        <columns>
-                            <Column><Text text="Column 1"/></Column>
-                            <Column><Text text="Column 2"/></Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem>
-                                <cells>
-                                    <Text text="11111111111"/>
-                                    <Text text="22222222222"/>
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                </VBox>
-            </Panel>
-
-            <!-- Header 2 Section -->
-            <Panel headerText="Header 2" backgroundDesign="Solid" class="sapUiMediumMarginBottom">
-                <VBox>
-                    <!-- Filters -->
-                    <HBox class="sapUiSmallMarginBottom" alignItems="Center" justifyContent="Start">
-                        <Label text="Search By ICHR" labelFor="ichrInput"/>
-                        <Input id="ichrInput" width="150px" class="sapUiTinyMarginBegin"/>
-                        <Button text="Search" type="Emphasized" press="onSearchICHR" class="sapUiTinyMarginBegin"/>
-                        <Button text="Change ICHR" press="onChangeICHR" class="sapUiTinyMarginBegin"/>
-                    </HBox>
-
-                    <!-- Table -->
-                    <Table id="ichrTable" inset="false" width="100%">
-                        <headerToolbar>
-                            <Toolbar>
-                                <Title text="ICHR Details" level="H4"/>
-                            </Toolbar>
-                        </headerToolbar>
-                        <columns>
-                            <Column><Text text="Column 1"/></Column>
-                            <Column><Text text="Column 2"/></Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem>
-                                <cells>
-                                    <Text text="33333333333"/>
-                                    <Text text="4444444444444"/>
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                </VBox>
-            </Panel>
-
-        </VBox>
-    </content>
-
-    </Page>
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns="sap.m">
+	<Page id="page" title="{i18n>title}">
+		<content>
+			<VBox class="sapUiSmallMargin">
+				<!-- Header 1 Section -->
+				<Panel headerText="Status Change" backgroundDesign="Solid" class="sapUiMediumMarginBottom">
+					<VBox>
+						<!-- Filters -->
+						<HBox class="sapUiSmallMarginBottom" alignItems="Center" justifyContent="Start">
+							<Label text="Enter PSID : " labelFor="psidStatus"/>
+							<Input 
+								id="psidStatus" 
+								width="150px" 
+								type="Number" 
+								class="sapUiTinyMarginBegin" 
+								submit="psidStatusSearch"
+								liveChange="psidStatusSearch"/>
+							<!-- <Input 
+								id="psidStatus" 
+								width="150px"
+								type="Number"
+								showSuggestion="true"
+								showValueHelp="true" 
+								valueHelpOnly="true"
+								valueHelpRequest="psidValueHelp"
+								class="sapUiTinyMarginBegin"
+								suggestionItems="{psidModel>/}">
+							    <suggestionItems>
+									<core:Item text="{psidModel>psid}" />
+								</suggestionItems>
+							</Input> -->
+							<Button text="Go" type="Emphasized" press="psidStatusSearch" class="sapUiTinyMarginBegin"/>
+							<Label text="Change Status To" class="sapUiTinyMarginBegin"/>
+							<Select id="statusSelect" width="150px" class="sapUiTinyMarginBegin">
+								<items>
+									<core:Item key="" text=""/>
+									<core:Item key="I" text="Initial Draft"/>
+									<core:Item key="D" text="Save As Draft"/>
+								</items>
+							</Select>
+							<Button text="Save Status Change" type="Emphasized" press="onStatusSave" class="sapUiSmallMarginBegin"/>
+						</HBox>
+						<!-- Table -->
+						<Table 
+							id="psidStatusTable"
+							items="{
+								path: 'psidStatusModel>/',
+								length: 1
+							}"
+							inset="false" 
+							width="100%">
+							<headerToolbar>
+								<Toolbar>
+									<Title text="PSID Details" level="H4"/>
+								</Toolbar>
+							</headerToolbar>
+							<columns>
+								<Column>
+									<Text text="PSID"/>
+								</Column>
+								<Column>
+									<Text text="Name"/>
+								</Column>
+								<Column>
+									<Text text="IC"/>
+								</Column>
+								<Column>
+									<Text text="ICHR"/>
+								</Column>
+								<Column>
+									<Text text="Status"/>
+								</Column>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<cells>
+										<Text text="{psidStatusModel>psid}"/>
+										<Text text="{psidStatusModel>name}"/>
+										<Text text="{psidStatusModel>ic}"/>
+										<Text text="{psidStatusModel>ichr}"/>
+										<Text text="{psidStatusModel>status}"/>
+									</cells>
+								</ColumnListItem>
+							</items>
+						</Table>
+					</VBox>
+				</Panel>
+				<!-- Header 2 Section -->
+				<Panel headerText="ICHR Change" backgroundDesign="Solid" class="sapUiMediumMarginBottom">
+					<VBox>
+						<!-- Filters -->
+						<HBox class="sapUiSmallMarginBottom" alignItems="Center" justifyContent="Start">
+							<Label text="Enter ICHR : " labelFor="psidICHR"/>
+							<Input 
+								id="psidICHR" 
+								width="150px" 
+								type="Number" 
+								class="sapUiTinyMarginBegin" 
+								submit="psidICHRSearch"
+								liveChange="psidICHRSearch"/>
+							<Button text="Search" type="Emphasized" press="psidICHRSearch" class="sapUiTinyMarginBegin"/>
+							<Button text="Change ICHR" press="onChangeICHR" class="sapUiTinyMarginBegin"/>
+						</HBox>
+						<!-- Table -->
+						<Table 
+							id="psidICHRTable"
+							items="{
+								path: 'psidICHRModel>/'
+							}" 
+							inset="false" 
+							width="100%">
+							<headerToolbar>
+								<Toolbar>
+									<Title text="ICHR Reportee" level="H4"/>
+								</Toolbar>
+							</headerToolbar>
+							<columns>
+								<Column>
+									<Text text="ICHR"/>
+								</Column>
+								<Column>
+									<Text text="PSID"/>
+								</Column>
+								<Column>
+									<Text text="Name"/>
+								</Column>
+								<Column>
+									<Text text="IC"/>
+								</Column>
+								<Column>
+									<Text text="Status"/>
+								</Column>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<cells>
+										<Text text="{psidICHRModel>ichr}"/>
+										<Text text="{psidICHRModel>psid}"/>
+										<Text text="{psidICHRModel>name}"/>
+										<Text text="{psidICHRModel>ic}"/>
+										<Text text="{psidICHRModel>status}"/>
+									</cells>
+								</ColumnListItem>
+							</items> 
+						</Table>
+					</VBox>
+				</Panel>
+			</VBox>
+		</content>
+	</Page>
 </mvc:View>
