@@ -5,8 +5,9 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageBox",
+    "sap/m/MessageToast",
     "sap/m/Dialog",
-], (Controller, JSONModel, Fragment, Filter, FilterOperator, MessageBox, Dialog) => {
+], (Controller, JSONModel, Fragment, Filter, FilterOperator, MessageBox, MessageToast, Dialog) => {
     "use strict"
 
     return Controller.extend("com.lt.educationalstatusui.controller.Educational_Status_Check", {
@@ -175,101 +176,97 @@ sap.ui.define([
 
         //Status change to: I(Initial Draft) for selected PSID
         async onDeleteRecords(psidVal) {
-            let oModel = this.getOwnerComponent().getModel();
-            let aData = this.getView().getModel("psidStatusModel").getData();
-            let groupId = "deleteGroup";
+            const oModel = this.getOwnerComponent().getModel();
+            const aData = this.getView().getModel("psidStatusModel").getData();
+            const groupId = "deleteGroup";
 
             try {
-                // Delete the folder in DMS for Uploaded Docs resp to PSID
-                let success = await this.deleteSubFolderIfExists("/Educational_Certificates", psidVal);
+                const folderDeleted = await this.deleteSubFolderIfExists("/Educational_Certificates", psidVal);
 
-                if (success) {
-                    console.log("Subfolder deleted successfully.");
-
-                    if (aData.length) {
-                        for (let item of aData) {
-                            // Create context binding for each record
-                            let oBinding = oModel.bindContext(`/Educational_Details('${item.ID}')`, null, { groupId });
-
-                            // Wait for context to load
-                            await oBinding.requestObject();
-                            let oContext = oBinding.getBoundContext();
-
-                            // Mark for deletion
-                            oContext.delete(groupId);
-                        }
-
-                        // Submit all deletions in one batch
-                        await oModel.submitBatch(groupId);
-                        MessageBox.success("Status changed to Initial Draft for the PSID: " + psidVal);
-                        this.psidStatusSearch();
-                    } else {
-                        MessageBox.error("There are no records to delete.");
-                    }
-                } else {
-                    console.log("Error deleting subfolder or folder not found.");
+                if (!folderDeleted) {
+                    console.warn("Deletion failed.");
+                    this.getView().setBusy(false)
+                    return;
                 }
-            } catch (oError) {
-                MessageBox.error("Error deleting records\n\n" + oError);
-                console.error(oError);
+
+                if (!aData.length) {
+                    MessageBox.error("There are no records to delete.");
+                    this.getView().setBusy(false)
+                    return;
+                }
+
+                // Delete all records in batch
+                for (const item of aData) {
+                    const oBinding = oModel.bindContext(`/Educational_Details('${item.ID}')`, null, { groupId });
+                    await oBinding.requestObject();
+                    const oContext = oBinding.getBoundContext();
+                    oContext.delete(groupId);
+                }
+
+                await oModel.submitBatch(groupId);
+                MessageBox.success(`Status changed to Initial Draft for the PSID: ${psidVal}`);
+                this.psidStatusSearch();
+                this.getView().setBusy(false)
+
+            } catch (error) {
+                MessageBox.error(`Error deleting records\n\n${error}`);
+                console.error(error);
             }
         },
 
-        deleteSubFolderIfExists: function (mainFolderPath, subFolderName) {
-            return new Promise((resolve, reject) => {
-                let oDMSRoot = this.getOwnerComponent().getManifestObject().resolveUri('DMS_Dest'),
-                    sChildrenUrl = oDMSRoot + mainFolderPath + "?cmisselector=children"
+        async deleteSubFolderIfExists(mainFolderPath, subFolderName) {
+            const oDMSRoot = this.getOwnerComponent().getManifestObject().resolveUri('DMS_Dest');
+            const sChildrenUrl = `${oDMSRoot}${mainFolderPath}?cmisselector=children`;
 
-                jQuery.ajax({
+            try {
+                const response = await jQuery.ajax({
                     url: sChildrenUrl,
                     type: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+
+                if (!response?.objects?.length) {
+                    MessageToast.show(`No subfolders found in ${mainFolderPath}`);
+                    console.log(`No subfolders found in ${mainFolderPath}`);
+                    return true;
+                }
+
+                const found = response.objects.find(obj =>
+                    obj.object.properties["cmis:name"].value === subFolderName
+                );
+
+                if (!found) {
+                    MessageToast.show(`Subfolder '${subFolderName}' does not exist in ${mainFolderPath}`);
+                    console.log(`Subfolder '${subFolderName}' does not exist in ${mainFolderPath}`);
+                    return true;
+                }
+
+                const objectId = found.object.properties["cmis:objectId"].value;
+                const oForm = new FormData();
+                oForm.append("cmisaction", "deleteTree");
+                oForm.append("objectId", objectId);
+                oForm.append("allVersions", "true");
+                oForm.append("unfileObjects", "delete");
+                oForm.append("continueOnFailure", "true");
+
+                await jQuery.ajax({
+                    url: `${oDMSRoot}${mainFolderPath}`,
+                    type: "POST",
                     headers: { "Accept": "application/json" },
-                    success: function (response) {
-                        if (response && response.objects && response.objects.length > 0) {
-                            let found = response.objects.find(obj =>
-                                obj.object.properties["cmis:name"].value === subFolderName
-                            )
+                    data: oForm,
+                    contentType: false,
+                    processData: false
+                });
 
-                            if (found) {
-                                let objectId = found.object.properties["cmis:objectId"].value
-                                let oForm = new FormData()
-                                oForm.append("cmisaction", "deleteTree")
-                                oForm.append("objectId", objectId)
-                                oForm.append("allVersions", "true")
-                                oForm.append("unfileObjects", "delete")
-                                oForm.append("continueOnFailure", "true")
+                console.log(`Subfolder '${subFolderName}' deleted successfully.`);
+                MessageToast.show(`Subfolder '${subFolderName}' deleted successfully.`);
+                return true;
 
-                                jQuery.ajax({
-                                    url: oDMSRoot + mainFolderPath,
-                                    type: "POST",
-                                    headers: { "Accept": "application/json" },
-                                    data: oForm,
-                                    contentType: false,
-                                    processData: false,
-                                    success: function () {
-                                        MessageToast.show("Subfolder '" + subFolderName + "' deleted successfully.")
-                                        resolve(true)
-                                    },
-                                    error: function (xhr) {
-                                        MessageBox.error("Error deleting subfolder: " + xhr.responseText)
-                                        reject(false)
-                                    }
-                                })
-                            } else {
-                                MessageBox.information("Subfolder '" + subFolderName + "' does not exist in " + mainFolderPath)
-                                resolve(false)
-                            }
-                        } else {
-                            MessageBox.information("No subfolders found in " + mainFolderPath)
-                            resolve(false)
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        MessageBox.error("Error fetching subfolders: " + error)
-                        reject(false)
-                    }
-                })
-            })
+            } catch (error) {
+                MessageBox.error(`Error deleting subfolder: ${error.responseText || error}`);
+                this.getView().setBusy(false)
+                return false;
+            }
         },
 
         //Status change to: D(Save As Draft) for selected PSID
