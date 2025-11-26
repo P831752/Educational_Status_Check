@@ -21,10 +21,6 @@ sap.ui.define([
             let statusModel = new JSONModel()
             this.getView().setModel(statusModel, "psidStatusModel")
 
-            //ICHR Model
-            let ichrModel = new JSONModel()
-            this.getView().setModel(ichrModel, "ichrModel")
-
             //PSID ICHR Model
             let psidICHRModel = new JSONModel()
             this.getView().setModel(psidICHRModel, "psidICHRModel")
@@ -139,13 +135,17 @@ sap.ui.define([
             let filters = [new Filter("ichr", FilterOperator.EQ, ichrVal)]
             let ichrData = await this.psidDataFetch(filters)
 
-            this.getView().getModel("ichrModel").setData(ichrData)
-            this.getView().getModel("ichrModel").updateBindings()
-
             //To have only uique PSIDs
-            const uniqueRecords = Array.from(
+            let uniqueRecords = Array.from(
                 new Map(ichrData.map(item => [item.psid, item])).values()
             )
+
+            let oTitle = this.byId("psidICHRTable").getHeaderToolbar().getTitleControl()
+            
+            if (uniqueRecords.length) 
+                oTitle.setText("ICHR Reportee (" + uniqueRecords.length + ")")
+            else 
+                oTitle.setText("ICHR Reportee")
 
             this.getView().getModel("psidICHRModel").setData(uniqueRecords)
             this.getView().getModel("psidICHRModel").updateBindings()
@@ -153,101 +153,128 @@ sap.ui.define([
 
         //On Status Save Button Press
         onStatusSave() {
-            this.getView().setBusy(true)
             //Input Values
             let psidVal = this.byId("psidStatus").getValue()
             let status = this.byId("statusSelect").getSelectedKey()
+            let statusTxt = this.byId("statusSelect").getSelectedItem().getText()
 
-            switch (status) {
-                case "I":
-                    this.onDeleteRecords(psidVal)
-                    break
-                case "D":
-                    this.onUpdateRecords(psidVal, status, ichrVal)
-                    break
-                default:
-                    if (!psidVal) {
-                        MessageBox.warning("User has not entered PSID for Status Change, \n\nPlease Enter the PSID before proceeding ahead.")
-                    } else
-                        MessageBox.warning("Please Select the Status for Updatation before proceeding with Save.")
-                    break
+            if (!psidVal) {
+                MessageBox.warning("Please Enter the PSID to proceeding ahead.")
+                return
             }
+
+            if (!status) {
+                MessageBox.warning("Please Select the Status for Updatation before proceeding with Save.")
+                return
+            }
+
+            MessageBox.confirm(
+                `Do you want to update the status for the PSID: ${psidVal} to "${statusTxt}"?`,
+                {
+                    title: "Confirm",
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    emphasizedAction: MessageBox.Action.YES,
+
+                    onClose: async (oAction) => {
+                        if (oAction === MessageBox.Action.YES) {
+                            this.getView().setBusy(true)
+
+                            switch (status) {
+                                case "I":
+                                    this.onDeleteRecords(psidVal)
+                                    break
+                                case "D":
+                                    this.onUpdateRecords(psidVal)
+                                    break
+                                default:
+                                    this.getView().setBusy(false)
+                                    break
+                            }
+                        }
+
+                        else {
+                            MessageToast.show("Update cancelled.")
+                        }
+                    }
+                }
+            )
         },
 
         //Status change to: I(Initial Draft) for selected PSID
         async onDeleteRecords(psidVal) {
-            const oModel = this.getOwnerComponent().getModel();
-            const aData = this.getView().getModel("psidStatusModel").getData();
-            const groupId = "deleteGroup";
+            let oModel = this.getOwnerComponent().getModel()
+            let aData = this.getView().getModel("psidStatusModel").getData()
+            let groupId = "deleteGroup"
 
             try {
-                const folderDeleted = await this.deleteSubFolderIfExists("/Educational_Certificates", psidVal);
+                let folderDeleted = await this.deleteSubFolderIfExists("/Educational_Certificates", psidVal)
 
                 if (!folderDeleted) {
-                    console.warn("Deletion failed.");
+                    console.warn("Deletion failed.")
                     this.getView().setBusy(false)
-                    return;
+                    return
                 }
 
                 if (!aData.length) {
-                    MessageBox.error("There are no records to delete.");
+                    MessageBox.error("There are no records to delete.")
                     this.getView().setBusy(false)
-                    return;
+                    return
                 }
 
                 // Delete all records in batch
-                for (const item of aData) {
-                    const oBinding = oModel.bindContext(`/Educational_Details('${item.ID}')`, null, { groupId });
-                    await oBinding.requestObject();
-                    const oContext = oBinding.getBoundContext();
-                    oContext.delete(groupId);
+                for (let item of aData) {
+                    let oBinding = oModel.bindContext(`/Educational_Details('${item.ID}')`, null, { groupId })
+                    await oBinding.requestObject()
+                    let oContext = oBinding.getBoundContext()
+                    oContext.delete(groupId)
                 }
 
-                await oModel.submitBatch(groupId);
-                MessageBox.success(`Status changed to Initial Draft for the PSID: ${psidVal}`);
-                this.psidStatusSearch();
+                await oModel.submitBatch(groupId)
+                MessageBox.success(`Status changed to Initial Draft for the PSID: ${psidVal}`)
+                this.psidStatusSearch()
                 this.getView().setBusy(false)
 
             } catch (error) {
-                MessageBox.error(`Error deleting records\n\n${error}`);
-                console.error(error);
+                MessageBox.error(`Error deleting records\n\n${error}`)
+                console.error(error)
+                this.getView().setBusy(false)
             }
         },
 
         async deleteSubFolderIfExists(mainFolderPath, subFolderName) {
-            const oDMSRoot = this.getOwnerComponent().getManifestObject().resolveUri('DMS_Dest');
-            const sChildrenUrl = `${oDMSRoot}${mainFolderPath}?cmisselector=children`;
+            let oDMSRoot = this.getOwnerComponent().getManifestObject().resolveUri('DMS_Dest')
+            let sChildrenUrl = `${oDMSRoot}${mainFolderPath}?cmisselector=children`
 
             try {
-                const response = await jQuery.ajax({
+                let response = await jQuery.ajax({
                     url: sChildrenUrl,
                     type: "GET",
                     headers: { "Accept": "application/json" }
-                });
+                })
 
                 if (!response?.objects?.length) {
-                    MessageToast.show(`No subfolders found in ${mainFolderPath}`);
-                    console.log(`No subfolders found in ${mainFolderPath}`);
-                    return true;
+                    MessageToast.show(`No subfolders found in ${mainFolderPath}`)
+                    console.log(`No subfolders found in ${mainFolderPath}`)
+                    return true
                 }
 
-                const found = response.objects.find(obj =>
+                let found = response.objects.find(obj =>
                     obj.object.properties["cmis:name"].value === subFolderName
-                );
+                )
 
                 if (!found) {
-                    MessageToast.show(`Subfolder '${subFolderName}' does not exist in ${mainFolderPath}`);
-                    console.log(`Subfolder '${subFolderName}' does not exist in ${mainFolderPath}`);
-                    return true;
+                    MessageToast.show(`Subfolder '${subFolderName}' does not exist in ${mainFolderPath}`)
+                    console.log(`Subfolder '${subFolderName}' does not exist in ${mainFolderPath}`)
+                    return true
                 }
 
-                const objectId = found.object.properties["cmis:objectId"].value;
-                const oForm = new FormData();
-                oForm.append("cmisaction", "deleteTree");
-                oForm.append("objectId", objectId);
-                oForm.append("allVersions", "true");
-                oForm.append("unfileObjects", "delete");
-                oForm.append("continueOnFailure", "true");
+                let objectId = found.object.properties["cmis:objectId"].value
+                let oForm = new FormData()
+                oForm.append("cmisaction", "deleteTree")
+                oForm.append("objectId", objectId)
+                oForm.append("allVersions", "true")
+                oForm.append("unfileObjects", "delete")
+                oForm.append("continueOnFailure", "true")
 
                 await jQuery.ajax({
                     url: `${oDMSRoot}${mainFolderPath}`,
@@ -256,25 +283,23 @@ sap.ui.define([
                     data: oForm,
                     contentType: false,
                     processData: false
-                });
+                })
 
-                console.log(`Subfolder '${subFolderName}' deleted successfully.`);
-                MessageToast.show(`Subfolder '${subFolderName}' deleted successfully.`);
-                return true;
+                console.log(`Subfolder '${subFolderName}' deleted successfully.`)
+                MessageToast.show(`Subfolder '${subFolderName}' deleted successfully.`)
+                return true
 
             } catch (error) {
-                MessageBox.error(`Error deleting subfolder: ${error.responseText || error}`);
+                MessageBox.error(`Error deleting subfolder: ${error.responseText || error}`)
                 this.getView().setBusy(false)
-                return false;
+                return false
             }
         },
 
         //Status change to: D(Save As Draft) for selected PSID
-        async onUpdateRecords(psidVal, status, ichrVal) {
+        async onUpdateRecords(psidVal) {
             let oModel = this.getOwnerComponent().getModel()
-            let oData = status
-                ? this.getView().getModel("psidStatusModel").getData()
-                : this.getView().getModel("ichrModel").getData()
+            let oData = this.getView().getModel("psidStatusModel").getData()
 
             let groupId = "updateGroup"
 
@@ -288,22 +313,18 @@ sap.ui.define([
                     let oContext = oBinding.getBoundContext()
 
                     // Set properties for update
-                    if (status) oContext.setProperty("status", status)
-                    else if (ichrVal) oContext.setProperty("ichr", ichrVal)
+                    oContext.setProperty("status", "D")
                 }
 
                 if (oData.length) {
                     // Submit all changes in one batch
                     await oModel.submitBatch(groupId)
-                    if (status) {
-                        MessageBox.success("Status changed to Save As Draft for the PSID: " + psidVal)
-                        this.psidStatusSearch()
-                    }
-                    else {
-                        MessageBox.success("ICHR changed from " + psidVal + "   to " + ichrVal)
-                        this.psidICHRSearch()
-                    }
-                } else MessageBox.error("There is no records to Update.")
+
+                    MessageBox.success("Status changed to Save As Draft for the PSID: " + psidVal)
+                    this.psidStatusSearch()
+                }
+
+                else MessageBox.error("There is no records to Update.")
                 this.getView().setBusy(false)
             }
 
@@ -317,7 +338,13 @@ sap.ui.define([
         onChangeICHR() {
             let psidVal = this.byId("psidICHR").getValue()
             if (!psidVal) {
-                MessageBox.warning("User has not entered PSID for ICHR Change, \n\nPlease Enter the PSID before proceeding ahead.")
+                MessageBox.warning("User has not entered ICHR for Change, \n\nPlease Enter the ICHR before proceeding ahead.")
+                return
+            }
+
+            let ichrData = this.getView().getModel("psidICHRModel").getData()
+            if (!ichrData.length) {
+                MessageBox.warning("User has not entered Valid ICHR, Please Enter Valid ICHR.")
                 return
             }
 
@@ -334,6 +361,7 @@ sap.ui.define([
                             text: "Please Enter the ICHR ID in the input box:",
                             labelFor: "idICHR"
                         }),
+
                         new sap.m.Input("idICHR", {
                             width: "100%",
                             type: "Number",
@@ -344,17 +372,40 @@ sap.ui.define([
                             }.bind(this)
                         })
                     ],
+
                     beginButton: new sap.m.Button({
                         type: sap.m.ButtonType.Emphasized,
                         text: "Submit",
                         enabled: false,
+
                         press: function () {
                             let ichrVal = sap.ui.core.Element.getElementById("idICHR").getValue()
-                            if (ichrVal) this.ichrConfirm(ichrVal)
+                            if (ichrVal) {
+
+                                MessageBox.confirm(
+                                    `Do you want to update the ICHR value to ${ichrVal} for the displayed PSIDs?`,
+                                    {
+                                        title: "Confirm",
+                                        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                                        emphasizedAction: MessageBox.Action.YES,
+                                        onClose: (oAction) => {
+
+                                            if (oAction === MessageBox.Action.YES) {
+                                                this.getView().setBusy(true)
+                                                this.ichrConfirm(ichrVal)
+                                            }
+
+                                            else MessageToast.show("Update cancelled.");
+                                        }
+                                    }
+                                )
+                            }
+
                             else MessageBox.warning("Please Enter ICHR before proceeding with Submit.")
                             this.ichrDialog.close()
                         }.bind(this)
                     }),
+
                     endButton: new sap.m.Button({
                         text: "Cancel",
                         press: function () {
@@ -368,7 +419,6 @@ sap.ui.define([
         },
 
         ichrConfirm(ichrVal) {
-            this.getView().setBusy(true)
             let psidVal = this.byId("psidICHR").getValue()
             let oModel = this.getOwnerComponent().getModel("sfapi")
 
@@ -379,18 +429,53 @@ sap.ui.define([
                 },
                 success: function (oData) {
                     if (oData > 0) {
-                        this.onUpdateRecords(psidVal, "", ichrVal)
+                        this.onUpdateICHR(psidVal, ichrVal)
                     } else {
                         MessageBox.warning("Please Enter Valid ICHR.")
+                        this.getView().setBusy(false)
                     }
                 }.bind(this),
                 error: function (oError) {
                     console.error("Error fetching count:", oError)
+                    this.getView().setBusy(false)
                 }
             }
 
             // Call the read method
             oModel.read(sPath, oParams)
+        },
+
+        async onUpdateICHR(psidVal, ichrVal) {
+            let ichrData = this.getView().getModel("psidICHRModel").getData()
+
+            const aRecords = ichrData.map(item => ({
+                psid: item.psid,
+                ichr: ichrVal
+            }))
+
+            try {
+                let oModel = this.getOwnerComponent().getModel()
+
+                let oOperation = oModel.bindContext("/updateICHR(...)")
+                oOperation.setParameter("records", aRecords)
+
+                await oOperation.execute()
+                let oBoundContext = oOperation.getBoundContext && oOperation.getBoundContext()
+                let oResult = oBoundContext.getObject()
+
+                console.log("updateICHR result:", oResult)
+                MessageBox.success("ICHR changed from " + psidVal + "   to " + ichrVal)
+
+                this.psidICHRSearch()
+                this.getView().setBusy(false)
+            }
+
+            catch (oError) {
+                console.error("updateICHR failed:", oError)
+                MessageBox.error("Failed to update ICHR: " + (oError.message || oError))
+                this.getView().setBusy(false)
+            }
         }
+
     })
 })

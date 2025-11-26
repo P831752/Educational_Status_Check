@@ -17,6 +17,13 @@
       "csrfProtection": false
     },
     {
+      "source": "^/DMS_Dest/(.*)$",
+      "target": "$1",
+      "destination": "DMS_Dest",
+      "authenticationType": "none",
+      "csrfProtection": false
+    },
+    {
       "source": "^/resources/(.*)$",
       "target": "/resources/$1",
       "authenticationType": "none",

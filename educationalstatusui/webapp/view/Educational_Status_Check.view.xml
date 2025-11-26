@@ -16,8 +16,7 @@
 								width="150px" 
 								type="Number" 
 								class="sapUiTinyMarginBegin" 
-								submit="psidStatusSearch"
-								liveChange="psidStatusSearch"/>
+								submit="psidStatusSearch"/>
 							<!-- <Input 
 								id="psidStatus" 
 								width="150px"
@@ -99,8 +98,7 @@
 								width="150px" 
 								type="Number" 
 								class="sapUiTinyMarginBegin" 
-								submit="psidICHRSearch"
-								liveChange="psidICHRSearch"/>
+								submit="psidICHRSearch"/>
 							<Button text="Search" type="Emphasized" press="psidICHRSearch" class="sapUiTinyMarginBegin"/>
 							<Button text="Change ICHR" press="onChangeICHR" class="sapUiTinyMarginBegin"/>
 						</HBox>
