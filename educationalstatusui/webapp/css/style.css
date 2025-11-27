@@ -1,3 +1,19 @@
+/* Increase title size and center it */
+.appTitle.sapMTitle {
+  font-size: 1.5rem;    
+  font-family: "72Black", "72Blackfull", "72", "72full", Arial, Helvetica, sans-serif;    
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.2;       
+}
+
+/* Optional: on small screens, slightly reduce */
+@media (max-width: 600px) {
+  .appTitle.sapMTitle {
+    font-size: 1rem;
+  }
+}
+
 .myCard {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
