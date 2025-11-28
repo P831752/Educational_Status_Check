@@ -4,13 +4,15 @@ sap.ui.define([
     "sap/ui/core/Fragment",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
+    "com/lt/educationalstatusui/model/Formatter",
     "sap/m/MessageBox",
     "sap/m/MessageToast",
     "sap/m/Dialog",
-], (Controller, JSONModel, Fragment, Filter, FilterOperator, MessageBox, MessageToast, Dialog) => {
+], (Controller, JSONModel, Fragment, Filter, FilterOperator, Formatter, MessageBox, MessageToast, Dialog) => {
     "use strict"
 
     return Controller.extend("com.lt.educationalstatusui.controller.Educational_Status_Check", {
+        formatter: Formatter,
 
         async onInit() {
             //Model Initialization
